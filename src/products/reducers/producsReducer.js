@@ -1,3 +1,4 @@
+import { createContext } from "react";
 import { GET_PRODUCTS,SHOW_ACTIVE_PRODUCT, ADD_PRODUCT_TO_CART,HIDE_ACTIVE_PRODUCT,REMOVE_PRODUCT_FROM_CART,REMOVE_ONE_FROM_CART } from "../types/types";
 
 export const initialState = {
@@ -9,6 +10,7 @@ export const initialState = {
     
 }
 
+export const productsContext = createContext();
 
 export const productsReducer = (state,action) => {
     switch(action.type) {

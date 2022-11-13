@@ -1,0 +1,10 @@
+.Searcher{
+    width: 160px;
+    padding: 3px;
+    text-align: center;
+    margin:20px auto;
+    position: relative;
+    left: calc(40%);
+    border-radius: 4px;
+   
+}

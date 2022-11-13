@@ -1,1 +1,2 @@
-# reducer-types-globalState-with-useReducer
+# useReducer - useContext
+- reducer-context-types-globalState

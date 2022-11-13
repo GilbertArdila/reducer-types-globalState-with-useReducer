@@ -1,17 +1,20 @@
-import React, { useReducer, useEffect, useState } from 'react';
-import { initialState, productsReducer } from './reducers/producsReducer';
-import { GET_PRODUCTS, SHOW_ACTIVE_PRODUCT, ADD_PRODUCT_TO_CART, HIDE_ACTIVE_PRODUCT, REMOVE_PRODUCT_FROM_CART, REMOVE_ONE_FROM_CART } from './types/types';
+import {useEffect, useState,useContext } from 'react';
+import { productsContext } from './reducers/producsReducer';
+import { GET_PRODUCTS, SHOW_ACTIVE_PRODUCT, ADD_PRODUCT_TO_CART, HIDE_ACTIVE_PRODUCT} from './types/types';
 import axios from "axios";
 import './styles/Products.css';
-import './styles/Cart.css'
+import './styles/Preview.css'
+import {Searcher} from './searcher/Searcher';
+import { LoaderSpiner } from './loader/LoaderSpiner';
 
 
 const ProductsApp = () => {
+    const [searchedProduct, setsearchedProduct] = useState('');
     const [showCart, setShowCart] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
 
-    const [state, dispatch] = useReducer(productsReducer, initialState);
-    const { products, cart, activeProduct } = state;
+    const [state, dispatch] = useContext(productsContext);
+    const { products,  activeProduct } = state;
 
    
 
@@ -61,25 +64,20 @@ const ProductsApp = () => {
 
     };
 
-    const handleRemoveFromCart = (id) => {
-        dispatch({
-            type: REMOVE_PRODUCT_FROM_CART,
-            payload: id
-        });
-    };
-
-    const handleRemoveOneFromCart = (id) => {
-        dispatch({
-            type: REMOVE_ONE_FROM_CART,
-            payload: id
-        });
-    };
+    const productSearched = products.filter((product) => {
+        return(
+            product.title.toLowerCase().includes(searchedProduct.toLowerCase()) || product.category.name.toLowerCase().includes(searchedProduct.toLowerCase())
+        )
+    });
+    
 
     return (
+        <>
+        <Searcher value={searchedProduct} onChange={(e)=>setsearchedProduct(e.target.value)}/>
         <div className='Products'>
             <h2>Products</h2>
             <section className='Products-container'>
-                {products.map((product) => (
+                {!products.length ? <LoaderSpiner/>: productSearched.map((product) => (
                     //checking the image exist to render the product
                     product.images[0].includes('https://') ?
 
@@ -102,46 +100,14 @@ const ProductsApp = () => {
                             <button className='btn add' onClick={() => handleAddProductToCart(product.id)}>Add to cart</button>
                         </div> : null
                 ))}
+                
             </section>
 
-            {showCart ?
-                <div className='Cart'>
-                    <h2>Check out</h2>
-                    <span className='Cart-container_close'
-                                onClick={()=>setShowCart(false)}
-                                >X</span> 
-                    <ul>
-                        {cart.map((product) => (
-                            <div
-                                className='Cart-container'
-                                key={product.id}>
-
-                                  
-
-                                <img src={product.images[0]} alt={product.title}
-                                    className='Cart-container_image'
-                                />
-                                <div className="Cart-container_info">
-                                    <h3 className='Cart-container_title'>{product.title}- quantity: {product.quantity}</h3>
-
-                                    <span className='Cart-continer_price'>Price:{' '}{product.price}</span>
-
-                                    <p className='Cart-container_total'>Total:{' '}{parseInt(product.price) * parseInt(product.quantity)}</p>
-                                    
-                                </div>
+            
 
 
-                                <button className='btn removeAll' onClick={() => handleRemoveFromCart(product.id)}>Remove all items from  cart</button>
-                                {product.quantity > 1 ? <button className='btn removeOne' onClick={() => handleRemoveOneFromCart(product.id)}>Remove one item from  cart</button> : null}
-                            </div>
-                        ))}
-                    </ul>
-                   
-                </div>
-                : null}
-
-
-            {activeProduct.id !== undefined && showDetails ? <div className='Preview'>
+            {activeProduct.id !== undefined && showDetails ? <div className='Preview' >
+               
                  <h2>Product preview</h2>
                 <span
                 className='Preview-container_close'
@@ -164,6 +130,7 @@ const ProductsApp = () => {
             </div> : null}
 
         </div>
+        </>
     )
 }
 export { ProductsApp };
